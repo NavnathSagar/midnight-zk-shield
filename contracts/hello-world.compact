@@ -1,12 +1,23 @@
-pragma language_version >= 0.23;
-
+pragma language_version >= 0.16;
 import CompactStandardLibrary;
 
-// Public ledger state - visible on blockchain
-export ledger message: Opaque<"string">;
+// 1. PUBLIC LEDGER STATE
+export ledger interactionCount: Counter;
 
-// Circuit to store a message on the blockchain
-// The message will be publicly visible
-export circuit storeMessage(customMessage: Opaque<"string">): [] {
-    message = disclose(customMessage);
+// 2. PRIVATE WITNESSES
+witness secretValue(): Uint<32>;
+
+// FIX: Changed from Uint<32> to Uint<16> to match the Counter's expected type
+witness stepAmount(): Uint<16>;
+
+constructor() {
+    interactionCount.increment(0);
+}
+
+export circuit submit_interaction(): [] {
+    // Hidden constraint: checks the private value locally without exposing it
+    assert(secretValue() >= 100, "Secret value must be at least 100");
+    
+    // 3. DELIBERATE DISCLOSE: reveals the step amount to the network to update the public counter
+    interactionCount.increment(disclose(stepAmount()));
 }
