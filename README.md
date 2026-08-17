@@ -39,3 +39,4 @@ git clone <your-repo-url>
 cd zk-shield
 npm install
 npm run compile
+Pending (Midnight Preprod RPC nodes failing to sync locally - testnet outage. Contract compiles successfully.)
